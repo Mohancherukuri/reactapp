@@ -6,14 +6,13 @@ pipeline {
         BRANCH_NAME = "${env.GIT_BRANCH}"
         TOMCAT_SERVER = "http://192.168.0.113:8080"
         TOMCAT_USER = "admin"
-        TOMCAT_PASSWORD = "Moh123$$" // Or use credentials in Jenkins
+        TOMCAT_PASSWORD = credentials('tomcat-password') // Use Jenkins credentials for sensitive info
         TOMCAT_DEPLOY_PATH = "/opt/tomcat/webapps/ROOT/"
     }
 
-
     tools {
         // Specify the Node.js tool you have configured in Jenkins
-        nodejs 'node'  // 'NodeJS' is the name of the Node.js installation in Jenkins
+        nodejs 'node'  // 'node' is the name of the Node.js installation in Jenkins
     }
 
     stages {
@@ -27,20 +26,28 @@ pipeline {
             steps {
                 script {
                     // Install npm dependencies
-                    bat 'npm install'
+                    if (isUnix()) {
+                        sh 'npm install'  // For Unix-based systems (Linux/macOS)
+                    } else {
+                        bat 'npm install'  // For Windows systems
+                    }
                 }
             }
         }
 
+        stage('Build React App') {
+            steps {
+                script {
+                    // Run the React build process
+                    if (isUnix()) {
+                        sh 'npm run build'  // For Unix-based systems
+                    } else {
+                        bat 'npm run build'  // For Windows systems
+                    }
+                }
+            }
+        }
 
-        // stage('Build React App') {
-        //     steps {
-        //         script {
-        //             // Run the React build process
-        //             sh 'npm run build'
-        //         }
-        //     }
-        // }
         stage('Build') {
             steps {
                 echo "Building branch ${BRANCH_NAME}..."
@@ -52,5 +59,12 @@ pipeline {
                 echo "Running tests for ${BRANCH_NAME}..."
             }
         }
-    }  // Closing brace for 'stages'
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying to Tomcat server ${TOMCAT_SERVER}..."
+                // Add deployment logic, e.g., using SSH to copy build to Tomcat
+            }
+        }
+    }
 }  // Closing brace for 'pipeline'
