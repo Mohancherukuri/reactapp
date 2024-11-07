@@ -21,7 +21,7 @@ pipeline {
                 script {
                     // Strip 'origin/' prefix from the branch name if present
                     BRANCH_NAME = env.GIT_BRANCH.replaceFirst(/^origin\//, "")
-                    TOMCAT_DEPLOY_PATH = "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\Testing\\${BRANCH_NAME}"
+                    TOMCAT_DEPLOY_PATH = "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\${BRANCH_NAME}"
                     echo "Branch name after stripping origin/: ${BRANCH_NAME}"
                 }
             }
