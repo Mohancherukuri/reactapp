@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     echo "Installing Dependencies"
-                    // Install npm dependencies
+                    // Install npm dependencies based on OS
                     if (isUnix()) {
                         sh 'npm install'  // For Unix-based systems (Linux/macOS)
                     } else {
@@ -39,13 +39,16 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo "Running tests for ${BRANCH_NAME}..."
-                if (isUnix()) {
-                    sh 'npm test'  // For Unix-based systems (Linux/macOS)
-                } else {
-                    bat 'npm test'  // For Windows systems
+                script {
+                    echo "Running tests for ${BRANCH_NAME}..."
+                    // Run tests based on OS
+                    if (isUnix()) {
+                        sh 'npm test'  // For Unix-based systems (Linux/macOS)
+                    } else {
+                        bat 'npm test'  // For Windows systems
+                    }
+                    echo "Unit Tests Successful"
                 }
-                echo "Unit Tests Successful"
             }
         }
 
@@ -53,6 +56,7 @@ pipeline {
             steps {
                 script {
                     echo "Building React App..."
+                    // Run build command based on OS
                     if (isUnix()) {
                         sh 'npm run build'  // For Unix-based systems (Linux/macOS)
                     } else {
@@ -77,7 +81,6 @@ pipeline {
                     }
 
                     // Deploy the build directory to the Tomcat server
-                    // Using xcopy to copy files to Tomcat's ROOT directory (for Windows)
                     echo "Copying build files to Tomcat..."
                     bat """
                         rem Ensure Tomcat deploy path exists
