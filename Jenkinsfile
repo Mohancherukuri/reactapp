@@ -22,10 +22,11 @@ pipeline {
                 echo "Building branch ${BRANCH_NAME}..."
             }
         }
-        
+
         stage('Test') {
             steps {
                 echo "Running tests for ${BRANCH_NAME}..."
             }
         }
-}
+    }  // Closing brace for 'stages'
+}  // Closing brace for 'pipeline'
