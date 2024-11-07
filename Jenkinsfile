@@ -7,7 +7,7 @@ pipeline {
         TOMCAT_SERVER = "http://192.168.0.113:8080"
         TOMCAT_USER = "admin"
         TOMCAT_PASSWORD = "Moh123\$\$"  // Use Jenkins credentials for sensitive info
-        TOMCAT_DEPLOY_PATH = "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\Testing\\${en.GIT_BRANCH}"  // Ensure the correct path format
+        TOMCAT_DEPLOY_PATH = "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\Testing\\${env.GIT_BRANCH}"  // Ensure the correct path format
     }
 
     tools {
