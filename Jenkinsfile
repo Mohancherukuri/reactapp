@@ -25,46 +25,51 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
+                    echo "Installing Dependencies"
                     // Install npm dependencies
                     if (isUnix()) {
                         sh 'npm install'  // For Unix-based systems (Linux/macOS)
                     } else {
                         bat 'npm install'  // For Windows systems
                     }
+                    echo "Installing Dependencies Finished"
                 }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo "Running tests for ${BRANCH_NAME}..."
+                if (isUnix()) {
+                    sh 'npm test'  // For Unix-based systems (Linux/macOS)
+                } else {
+                    bat 'npm test'  // For Windows systems
+                }
+                echo "Unit Tests Successful"
             }
         }
 
         stage('Build React App') {
             steps {
-                script {
-                    // Run the React build process
-                    if (isUnix()) {
-                        sh 'npm run build'  // For Unix-based systems
-                    } else {
-                        bat 'npm run build'  // For Windows systems
-                    }
+                 script {
+                    // Deploy the React build directory to the Tomcat server
+                    // Assuming your React build directory is in './build/'
+                    // Use SCP, FTP, or direct copy for Windows to Tomcat
+                    bat """
+                        rem Copy the build directory to the Tomcat server's webapps folder
+                        xcopy /E /I /H /Y .\\build\\* ${TOMCAT_DEPLOY_PATH}
+                    """
                 }
             }
         }
-
-        stage('Build') {
-            steps {
-                echo "Building branch ${BRANCH_NAME}..."
-            }
+    }
+     post {
+        success {
+            echo 'Deployment successful!'
         }
-
-        stage('Test') {
-            steps {
-                echo "Running tests for ${BRANCH_NAME}..."
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo "Deploying to Tomcat server ${TOMCAT_SERVER}..."
-                // Add deployment logic, e.g., using SSH to copy build to Tomcat
-            }
+        
+        failure {
+            echo 'Deployment failed.'
         }
     }
 }  // Closing brace for 'pipeline'
