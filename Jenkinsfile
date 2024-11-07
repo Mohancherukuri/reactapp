@@ -6,7 +6,7 @@ pipeline {
         BRANCH_NAME = "${env.GIT_BRANCH}"
         TOMCAT_SERVER = "http://192.168.0.113:8080"
         TOMCAT_USER = "admin"
-        TOMCAT_PASSWORD = credentials('tomcat-password') // Use Jenkins credentials for sensitive info
+        TOMCAT_PASSWORD = "Moh123$$" // Use Jenkins credentials for sensitive info
         TOMCAT_DEPLOY_PATH = "/opt/tomcat/webapps/ROOT/"
     }
 
