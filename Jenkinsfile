@@ -22,12 +22,11 @@ pipeline {
                     // Strip 'origin/' prefix from the branch name if present
                     BRANCH_NAME = env.GIT_BRANCH.replaceFirst(/^origin\//, "")
                     TOMCAT_DEPLOY_PATH = "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps\\Testing\\${BRANCH_NAME}"
-                    
                     echo "Branch name after stripping origin/: ${BRANCH_NAME}"
                 }
             }
         }
-        
+
         stage('Checkout Code') {
             steps {
                 checkout scm
@@ -78,32 +77,32 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy React App') {
-            steps {
-                script {
-                    echo "Deploying to Tomcat server..."
+    steps {
+        script {
+            echo "Deploying to Tomcat server..."
 
-                    // Check if build directory exists
-                    def buildDir = "${WORKSPACE}\\build"
-                    if (isUnix()) {
-                        sh "ls -la ${buildDir}"  // List files to verify the build folder exists
-                    } else {
-                        bat "dir ${buildDir}"  // List files on Windows to verify the build folder exists
-                    }
-
-                    // Deploy the build directory to the Tomcat server
-                    echo "Copying build files to Tomcat..."
-                    bat """
-                        rem Ensure Tomcat deploy path exists
-                        if not exist "${TOMCAT_DEPLOY_PATH}" mkdir "${TOMCAT_DEPLOY_PATH}"
-                        rem Copy the build directory to the Tomcat server's webapps folder
-                        xcopy /E /I /H /Y .\\build\\* ${TOMCAT_DEPLOY_PATH}
-                    """
-                    echo "Deployment Completed"
-                }
+            // Check if build directory exists
+            def buildDir = "${WORKSPACE}\\build"
+            if (isUnix()) {
+                sh "ls -la ${buildDir}"  // List files to verify the build folder exists
+            } else {
+                bat "dir \"${buildDir}\""  // List files on Windows to verify the build folder exists
             }
+
+            // Deploy the build directory to the Tomcat server
+            echo "Copying build files to Tomcat..."
+            bat """
+                rem Ensure Tomcat deploy path exists
+                if not exist "${TOMCAT_DEPLOY_PATH}" mkdir "${TOMCAT_DEPLOY_PATH}"
+                rem Copy the build directory to the Tomcat server's webapps folder
+                xcopy /E /I /H /Y ".\\build\\*" "${TOMCAT_DEPLOY_PATH}"
+            """
+            echo "Deployment Completed"
         }
+    }
+}
+
     }
 
     post {
