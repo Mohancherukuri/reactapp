@@ -6,8 +6,8 @@ pipeline {
         BRANCH_NAME = "${env.GIT_BRANCH}"
         TOMCAT_SERVER = "http://192.168.0.113:8080"
         TOMCAT_USER = "admin"
-        TOMCAT_PASSWORD = "Moh123\$\$" // Use Jenkins credentials for sensitive info
-        TOMCAT_DEPLOY_PATH = "/opt/tomcat/webapps/ROOT/"
+        TOMCAT_PASSWORD = "Moh123\$\$"  // Use Jenkins credentials for sensitive info
+        TOMCAT_DEPLOY_PATH = "C:\\opt\\tomcat\\webapps\\ROOT\\"  // Ensure the correct path format
     }
 
     tools {
@@ -36,7 +36,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 echo "Running tests for ${BRANCH_NAME}..."
@@ -51,23 +51,51 @@ pipeline {
 
         stage('Build React App') {
             steps {
-                 script {
-                    // Deploy the React build directory to the Tomcat server
-                    // Assuming your React build directory is in './build/'
-                    // Use SCP, FTP, or direct copy for Windows to Tomcat
+                script {
+                    echo "Building React App..."
+                    if (isUnix()) {
+                        sh 'npm run build'  // For Unix-based systems (Linux/macOS)
+                    } else {
+                        bat 'npm run build'  // For Windows systems
+                    }
+                    echo "Build Completed"
+                }
+            }
+        }
+
+        stage('Deploy React App') {
+            steps {
+                script {
+                    echo "Deploying to Tomcat server..."
+
+                    // Check if build directory exists
+                    def buildDir = "${WORKSPACE}\\build"
+                    if (isUnix()) {
+                        sh "ls -la ${buildDir}"  // List files to verify the build folder exists
+                    } else {
+                        bat "dir ${buildDir}"  // List files on Windows to verify the build folder exists
+                    }
+
+                    // Deploy the build directory to the Tomcat server
+                    // Using xcopy to copy files to Tomcat's ROOT directory (for Windows)
+                    echo "Copying build files to Tomcat..."
                     bat """
+                        rem Ensure Tomcat deploy path exists
+                        if not exist "${TOMCAT_DEPLOY_PATH}" mkdir "${TOMCAT_DEPLOY_PATH}"
                         rem Copy the build directory to the Tomcat server's webapps folder
                         xcopy /E /I /H /Y .\\build\\* ${TOMCAT_DEPLOY_PATH}
                     """
+                    echo "Deployment Completed"
                 }
             }
         }
     }
-     post {
+
+    post {
         success {
             echo 'Deployment successful!'
         }
-        
+
         failure {
             echo 'Deployment failed.'
         }
