@@ -9,19 +9,14 @@ const LoginForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Simple form validation
     if (!email || !password) {
       setError("Both fields are required!");
       return;
     }
 
-    // Clear error if validation passes
     setError("");
 
-    // You can add login logic here
     console.log("Logging in with:", { email, password });
-
-    // Optionally redirect or handle login response here
   };
 
   return (
